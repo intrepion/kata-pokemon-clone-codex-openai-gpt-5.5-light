@@ -1,4 +1,4 @@
-import type { Starter } from "../domain/types";
+import type { CreatureSpecies, Starter } from "../domain/types";
 
 export const STARTERS: readonly Starter[] = [
   {
@@ -20,3 +20,78 @@ export const STARTERS: readonly Starter[] = [
     description: "A riverwise Tide otter that hums before a wave."
   }
 ];
+
+export const CREATURES: Record<string, CreatureSpecies> = {
+  sprigget: {
+    id: "sprigget",
+    name: "Sprigget",
+    type: "leaf",
+    maxHp: 24,
+    moves: [
+      { id: "paw-tap", name: "Paw Tap", type: "neutral", power: 5 },
+      { id: "sprout-arc", name: "Sprout Arc", type: "leaf", power: 8 }
+    ]
+  },
+  cindillo: {
+    id: "cindillo",
+    name: "Cindillo",
+    type: "ember",
+    maxHp: 23,
+    moves: [
+      { id: "shell-bump", name: "Shell Bump", type: "neutral", power: 5 },
+      { id: "cinder-roll", name: "Cinder Roll", type: "ember", power: 8 }
+    ]
+  },
+  otterune: {
+    id: "otterune",
+    name: "Otterune",
+    type: "tide",
+    maxHp: 25,
+    moves: [
+      { id: "tail-slap", name: "Tail Slap", type: "neutral", power: 5 },
+      { id: "ripple-note", name: "Ripple Note", type: "tide", power: 8 }
+    ]
+  },
+  mossbit: {
+    id: "mossbit",
+    name: "Mossbit",
+    type: "leaf",
+    maxHp: 18,
+    moves: [
+      { id: "nibble", name: "Nibble", type: "neutral", power: 4 },
+      { id: "leaf-flick", name: "Leaf Flick", type: "leaf", power: 6 }
+    ]
+  },
+  flarabbit: {
+    id: "flarabbit",
+    name: "Flarabbit",
+    type: "ember",
+    maxHp: 17,
+    moves: [
+      { id: "hop-kick", name: "Hop Kick", type: "neutral", power: 4 },
+      { id: "spark-ear", name: "Spark Ear", type: "ember", power: 6 }
+    ]
+  },
+  brookfin: {
+    id: "brookfin",
+    name: "Brookfin",
+    type: "tide",
+    maxHp: 19,
+    moves: [
+      { id: "fin-swipe", name: "Fin Swipe", type: "neutral", power: 4 },
+      { id: "stream-pop", name: "Stream Pop", type: "tide", power: 6 }
+    ]
+  },
+  huskwing: {
+    id: "huskwing",
+    name: "Huskwing",
+    type: "neutral",
+    maxHp: 16,
+    moves: [
+      { id: "wing-dust", name: "Wing Dust", type: "neutral", power: 4 },
+      { id: "husk-rattle", name: "Husk Rattle", type: "neutral", power: 5 }
+    ]
+  }
+};
+
+export const ROUTE_ONE_CREATURE_IDS = ["mossbit", "flarabbit", "brookfin", "huskwing"] as const;

@@ -1,6 +1,8 @@
 import { STARTERS } from "../data/starters";
-import type { Direction, Starter } from "../domain/types";
-import { chooseStarter, createInitialState, interact, moveTrainer } from "../domain/game";
+import type { BattleState, Direction, Starter } from "../domain/types";
+import { chooseStarter, createInitialState, interact, moveTrainer, useMove } from "../domain/game";
+import { SeededRng } from "../domain/rng";
+import { CREATURES } from "../data/starters";
 import { drawScene } from "../render/canvas";
 import "./styles.css";
 
@@ -16,6 +18,8 @@ const DIRECTIONS: Record<string, Direction> = {
 };
 
 export function mountApp(root: HTMLElement): void {
+  const params = new URLSearchParams(window.location.search);
+  const rng = new SeededRng(Number(params.get("seed") ?? 7));
   let state = createInitialState();
   root.innerHTML = `
     <main class="shell">
@@ -25,6 +29,7 @@ export function mountApp(root: HTMLElement): void {
       <section class="panel" aria-label="Journey controls">
         <h1>Briarbrook League</h1>
         <p class="status" data-testid="status"></p>
+        <div class="battle" data-testid="battle"></div>
         <div class="starter-grid" data-testid="starter-grid"></div>
         <div class="controls" aria-label="Movement controls">
           <button data-dir="north">Up</button>
@@ -42,18 +47,23 @@ export function mountApp(root: HTMLElement): void {
   const statusElement = root.querySelector<HTMLElement>("[data-testid='status']");
   const starterGridElement = root.querySelector<HTMLElement>("[data-testid='starter-grid']");
   const dialogueElement = root.querySelector<HTMLElement>("[data-testid='dialogue']");
-  if (!canvasElement || !statusElement || !starterGridElement || !dialogueElement) {
+  const battleElement = root.querySelector<HTMLElement>("[data-testid='battle']");
+  if (!canvasElement || !statusElement || !starterGridElement || !dialogueElement || !battleElement) {
     throw new Error("Briarbrook UI failed to mount.");
   }
   const canvas = canvasElement;
   const status = statusElement;
   const starterGrid = starterGridElement;
   const dialogue = dialogueElement;
+  const battlePanel = battleElement;
 
   function render(): void {
     drawScene(canvas, state);
     const starter = STARTERS.find((candidate) => candidate.id === state.starterId);
-    status.textContent = `Tile ${state.position.x},${state.position.y} facing ${state.facing}. Starter: ${starter?.name ?? "none"}.`;
+    const lead = state.party[0];
+    const hpText = lead ? ` ${CREATURES[lead.speciesId]?.name ?? lead.speciesId} HP ${lead.hp}.` : "";
+    status.textContent = `Tile ${state.position.x},${state.position.y} facing ${state.facing}. Starter: ${starter?.name ?? "none"}.${hpText}`;
+    battlePanel.innerHTML = state.battle ? battleMarkup(state.battle) : "";
     starterGrid.innerHTML = STARTERS.map(starterOption).join("");
     dialogue.innerHTML = state.dialogue.map((line) => `<li>${line}</li>`).join("");
   }
@@ -77,11 +87,15 @@ export function mountApp(root: HTMLElement): void {
       return;
     }
     if (target.dataset.dir) {
-      state = moveTrainer(state, target.dataset.dir as Direction);
+      state = moveTrainer(state, target.dataset.dir as Direction, rng);
       render();
     }
     if (target.dataset.action === "confirm") {
       state = interact(state);
+      render();
+    }
+    if (target.dataset.move === "0" || target.dataset.move === "1") {
+      state = useMove(state, Number(target.dataset.move) as 0 | 1);
       render();
     }
   });
@@ -90,7 +104,7 @@ export function mountApp(root: HTMLElement): void {
     const direction = DIRECTIONS[event.code];
     if (direction) {
       event.preventDefault();
-      state = moveTrainer(state, direction);
+      state = moveTrainer(state, direction, rng);
       render();
     }
     if (["Space", "Enter", "KeyZ"].includes(event.code)) {
@@ -110,5 +124,19 @@ function starterOption(starter: Starter): string {
       <span>${starter.type.toUpperCase()}</span>
       <small>${starter.description}</small>
     </button>
+  `;
+}
+
+function battleMarkup(battle: BattleState): string {
+  const opponent = CREATURES[battle.opponent.speciesId];
+  const player = CREATURES[battle.player.speciesId];
+  return `
+    <section class="battle-scene" aria-label="Battle Scene">
+      <h2>Battle Scene</h2>
+      <p>${battle.message}</p>
+      <p>${player.name} HP ${battle.player.hp} vs ${opponent.name} HP ${battle.opponent.hp}</p>
+      <button data-move="0">${player.moves[0].name}</button>
+      <button data-move="1">${player.moves[1].name}</button>
+    </section>
   `;
 }

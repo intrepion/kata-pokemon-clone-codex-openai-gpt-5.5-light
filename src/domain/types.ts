@@ -14,9 +14,40 @@ export interface Starter {
   readonly description: string;
 }
 
+export interface Move {
+  readonly id: string;
+  readonly name: string;
+  readonly type: CreatureType;
+  readonly power: number;
+}
+
+export interface CreatureSpecies {
+  readonly id: string;
+  readonly name: string;
+  readonly type: CreatureType;
+  readonly maxHp: number;
+  readonly moves: readonly [Move, Move];
+}
+
+export interface CreatureInstance {
+  readonly instanceId: string;
+  readonly speciesId: string;
+  readonly level: number;
+  readonly hp: number;
+}
+
+export interface BattleState {
+  readonly kind: "wild" | "trainer";
+  readonly player: CreatureInstance;
+  readonly opponent: CreatureInstance;
+  readonly message: string;
+}
+
 export interface GameState {
   readonly position: Position;
   readonly facing: Direction;
   readonly starterId: Starter["id"] | null;
+  readonly party: readonly CreatureInstance[];
+  readonly battle: BattleState | null;
   readonly dialogue: readonly string[];
 }

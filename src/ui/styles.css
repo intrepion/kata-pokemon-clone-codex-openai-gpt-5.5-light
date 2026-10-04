@@ -65,6 +65,21 @@ button:focus-visible {
   gap: 0.6rem;
 }
 
+.battle-scene {
+  background: #f7edcf;
+  border: 3px solid #1f2a24;
+  color: #1f2a24;
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+}
+
+.battle-scene h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+
 .starter-card {
   display: grid;
   gap: 0.25rem;

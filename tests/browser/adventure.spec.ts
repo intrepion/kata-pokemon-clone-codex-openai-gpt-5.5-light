@@ -23,3 +23,16 @@ test("mobile controls expose movement and confirm actions", async ({ page }) => 
   await page.getByRole("button", { name: "A", exact: true }).click();
   await expect(page.getByTestId("dialogue")).toContainText("Nothing responds.");
 });
+
+test("tall grass can start and resolve a wild battle", async ({ page }) => {
+  await page.goto("/?seed=1");
+
+  await page.getByRole("button", { name: /Cindillo/ }).click();
+  for (const key of ["ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight"]) {
+    await page.keyboard.press(key);
+  }
+
+  await expect(page.getByTestId("battle")).toContainText("Battle Scene");
+  await page.getByRole("button", { name: "Cinder Roll" }).click();
+  await expect(page.getByTestId("dialogue")).toContainText(/fainted|used/);
+});
