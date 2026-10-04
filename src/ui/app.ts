@@ -4,6 +4,7 @@ import { attemptCapture, chooseStarter, createInitialState, interact, moveTraine
 import { SeededRng } from "../domain/rng";
 import { CREATURES } from "../data/starters";
 import { parseSavedState, SAVE_KEY, serializeState } from "../domain/storage";
+import { AudioCues } from "./audio";
 import { drawScene } from "../render/canvas";
 import "./styles.css";
 
@@ -21,6 +22,7 @@ const DIRECTIONS: Record<string, Direction> = {
 export function mountApp(root: HTMLElement): void {
   const params = new URLSearchParams(window.location.search);
   const rng = new SeededRng(Number(params.get("seed") ?? 7));
+  const audio = new AudioCues();
   let state = parseSavedState(window.localStorage.getItem(SAVE_KEY)) ?? createInitialState();
   root.innerHTML = `
     <main class="shell">
@@ -30,6 +32,7 @@ export function mountApp(root: HTMLElement): void {
       <section class="panel" aria-label="Journey controls">
         <h1>Briarbrook League</h1>
         <p class="status" data-testid="status"></p>
+        <button class="mute" data-action="mute" aria-pressed="true">Muted</button>
         <div class="win-panel" data-testid="win-panel"></div>
         <div class="battle" data-testid="battle"></div>
         <div class="field-guide" data-testid="field-guide"></div>
@@ -98,19 +101,28 @@ export function mountApp(root: HTMLElement): void {
     }
     if (target.dataset.dir) {
       state = moveTrainer(state, target.dataset.dir as Direction, rng);
+      audio.play(state.battle ? "battle" : "step");
       render();
     }
     if (target.dataset.action === "confirm") {
       state = interact(state);
+      audio.play(state.battle ? "battle" : "confirm");
       render();
     }
     if (target.dataset.move === "0" || target.dataset.move === "1") {
       state = useMove(state, Number(target.dataset.move) as 0 | 1);
+      audio.play(state.winPanel ? "badge" : "hit");
       render();
     }
     if (target.dataset.action === "capture") {
       state = attemptCapture(state, rng);
+      audio.play("capture");
       render();
+    }
+    if (target.dataset.action === "mute") {
+      audio.setMuted(!audio.isMuted());
+      target.textContent = audio.isMuted() ? "Muted" : "Sound On";
+      target.setAttribute("aria-pressed", String(audio.isMuted()));
     }
   });
 
@@ -119,11 +131,13 @@ export function mountApp(root: HTMLElement): void {
     if (direction) {
       event.preventDefault();
       state = moveTrainer(state, direction, rng);
+      audio.play(state.battle ? "battle" : "step");
       render();
     }
     if (["Space", "Enter", "KeyZ"].includes(event.code)) {
       event.preventDefault();
       state = interact(state);
+      audio.play(state.battle ? "battle" : "confirm");
       render();
     }
   });

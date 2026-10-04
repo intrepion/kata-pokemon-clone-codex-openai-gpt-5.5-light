@@ -1,12 +1,13 @@
 import { expect, test } from "@playwright/test";
+import { pathToFileURL } from "node:url";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev.html");
   await page.evaluate(() => window.localStorage.clear());
 });
 
 test("player can choose a starter and move on the tile map", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev.html");
 
   await expect(page.getByRole("heading", { name: "Briarbrook League" })).toBeVisible();
   await page.getByRole("button", { name: /Cindillo/ }).click();
@@ -20,17 +21,20 @@ test("player can choose a starter and move on the tile map", async ({ page }) =>
 });
 
 test("mobile controls expose movement and confirm actions", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/dev.html");
 
   await page.getByRole("button", { name: "Right", exact: true }).click();
   await expect(page.getByTestId("status")).toContainText("Tile 3,7");
+
+  await page.getByRole("button", { name: "Muted" }).click();
+  await expect(page.getByRole("button", { name: "Sound On" })).toBeVisible();
 
   await page.getByRole("button", { name: "A", exact: true }).click();
   await expect(page.getByTestId("dialogue")).toContainText("Nothing responds.");
 });
 
 test("tall grass can start and resolve a wild battle", async ({ page }) => {
-  await page.goto("/?seed=1");
+  await page.goto("/dev.html?seed=1");
 
   await page.getByRole("button", { name: /Cindillo/ }).click();
   for (const key of ["ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight"]) {
@@ -43,7 +47,7 @@ test("tall grass can start and resolve a wild battle", async ({ page }) => {
 });
 
 test("player can capture a wild creature and restore autosave on reload", async ({ page }) => {
-  await page.goto("/?seed=1");
+  await page.goto("/dev.html?seed=1");
 
   await page.getByRole("button", { name: /Cindillo/ }).click();
   for (const key of ["ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight"]) {
@@ -59,7 +63,7 @@ test("player can capture a wild creature and restore autosave on reload", async 
 });
 
 test("player can earn the Meadow Badge and see the win panel", async ({ page }) => {
-  await page.goto("/?seed=999");
+  await page.goto("/dev.html?seed=999");
 
   await page.getByRole("button", { name: /Cindillo/ }).click();
   for (const key of ["ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "Space"]) {
@@ -73,4 +77,13 @@ test("player can earn the Meadow Badge and see the win panel", async ({ page }) 
 
   await expect(page.getByTestId("status")).toContainText("Meadow Badge: earned");
   await expect(page.getByTestId("win-panel")).toContainText("Briarbrook League begins");
+});
+
+test("root index works through direct file packaging", async ({ page }) => {
+  await page.goto(pathToFileURL(`${process.cwd()}/index.html`).href);
+  await page.evaluate(() => window.localStorage.clear());
+
+  await expect(page.getByRole("heading", { name: "Briarbrook League" })).toBeVisible();
+  await page.getByRole("button", { name: /Sprigget/ }).click();
+  await expect(page.getByTestId("status")).toContainText("Starter: Sprigget");
 });

@@ -60,6 +60,10 @@ button:focus-visible {
   min-height: 3rem;
 }
 
+.mute {
+  margin-bottom: 1rem;
+}
+
 .starter-grid {
   display: grid;
   gap: 0.6rem;
