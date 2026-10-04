@@ -20,6 +20,10 @@ _Avoid_: Player character, NPC battler
 The trainer's active roster of creatures available for battle and progression.
 _Avoid_: Team, deck, bench
 
+**Active Party Limit**:
+The maximum number of creatures the trainer can carry in the active Party during the First Badge Loop.
+_Avoid_: Team size, roster cap
+
 **Starter**:
 The first creature selected by the player before route exploration begins.
 _Avoid_: First Pokemon, default creature
@@ -68,6 +72,10 @@ _Avoid_: Lab, professor lab
 The first route connecting the opening town to the badge challenge.
 _Avoid_: First level
 
+**Route 1 Creature**:
+One of the four wild creatures discoverable on Route 1 during the First Badge Loop.
+_Avoid_: Common spawn, early monster
+
 **Healing Hut**:
 A safe location where the trainer restores the party and restocks basic capture supplies.
 _Avoid_: Pokemon Center, shop
@@ -80,9 +88,25 @@ _Avoid_: Gym, boss arena
 Route terrain that can trigger a wild encounter while the trainer moves through it.
 _Avoid_: Random encounter tile, spawn area
 
+**Step**:
+A completed tile-to-tile movement by the trainer on the top-down map.
+_Avoid_: Frame movement, pixel movement
+
+**Grace Period**:
+A short span after an encounter during which tall grass cannot immediately trigger another encounter.
+_Avoid_: Cooldown, immunity window
+
+**Facing Interaction**:
+A one-button interaction with the tile directly in front of the trainer.
+_Avoid_: Click interaction, dialogue tree
+
 **Encounter**:
 A modal interaction that interrupts exploration and resolves through battle, capture, flee, or scripted trainer victory.
 _Avoid_: Fight, event, combat screen
+
+**Battle Scene**:
+The full-screen modal presentation used for encounters, separate from the exploration map.
+_Avoid_: Battle overlay, combat panel
 
 **Wild Encounter**:
 An encounter against a creature that does not already belong to a trainer and may be captured.
@@ -111,6 +135,10 @@ _Avoid_: Gym badge, achievement
 **Meadow Badge**:
 The first badge, earned by defeating the Leaf-favoring trainer challenge at Badge Meadow.
 _Avoid_: Grass badge, gym badge
+
+**Autosave**:
+The automatic persistence of journey progress after meaningful exploration, party, encounter, capture, and badge changes.
+_Avoid_: Manual save, checkpoint
 
 **First Badge Loop**:
 The initial complete progression arc: choose a starter, explore a route, capture creatures, heal, defeat the first major trainer challenge, and earn a badge.
