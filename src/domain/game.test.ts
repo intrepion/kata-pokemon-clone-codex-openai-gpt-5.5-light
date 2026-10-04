@@ -78,4 +78,26 @@ describe("starter selection and interaction", () => {
     expect(afterCapture.party.map((creature) => creature.speciesId)).toContain("mossbit");
     expect(afterCapture.guide.mossbit).toBe("captured");
   });
+
+  it("awards the Meadow Badge after the Badge Meadow trainer battle", () => {
+    const starterState = chooseStarter(createInitialState(), "cindillo");
+    const state = {
+      ...starterState,
+      battle: {
+        kind: "trainer" as const,
+        player: starterState.party[0],
+        opponent: { instanceId: "petalark-test", speciesId: "petalark", level: 4, hp: 1 },
+        remainingOpponents: [{ instanceId: "bramblet-test", speciesId: "bramblet", level: 5, hp: 1 }],
+        message: "Badge Meadow trainer Liora challenges you."
+      }
+    };
+
+    const afterFirst = useMove(state, 1);
+    const afterSecond = useMove(afterFirst, 1);
+
+    expect(afterSecond.meadowBadge).toBe(true);
+    expect(afterSecond.pathOpen).toBe(true);
+    expect(afterSecond.winPanel).toBe(true);
+    expect(afterSecond.dialogue[0]).toContain("Meadow Badge");
+  });
 });

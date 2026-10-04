@@ -15,6 +15,9 @@ export function createInitialState(): GameState {
     party: [],
     captureCharms: 5,
     guide: {},
+    meadowBadge: false,
+    pathOpen: false,
+    winPanel: false,
     battle: null,
     dialogue: ["Welcome to Briarbrook League."]
   };
@@ -57,6 +60,9 @@ export function interact(state: GameState): GameState {
       dialogue: ["Your party is restored at the Healing Hut.", ...state.dialogue].slice(0, 5)
     };
   }
+  if (object.kind === "blocker") {
+    return state.meadowBadge ? openBadgePath(state) : startTrainerBattle(state);
+  }
   return { ...state, dialogue: [object.message, ...state.dialogue].slice(0, 5) };
 }
 
@@ -87,6 +93,32 @@ export function useMove(state: GameState, moveIndex: 0 | 1): GameState {
   const battle = usePlayerMove(state.battle, moveIndex);
   const party = state.party.map((creature) => (creature.instanceId === battle.player.instanceId ? battle.player : creature));
   if (battle.opponent.hp === 0) {
+    if (battle.kind === "trainer") {
+      const nextOpponent = battle.remainingOpponents?.[0];
+      if (nextOpponent) {
+        return {
+          ...state,
+          battle: {
+            kind: "trainer",
+            player: battle.player,
+            opponent: nextOpponent,
+            remainingOpponents: battle.remainingOpponents?.slice(1) ?? [],
+            message: `Badge Meadow sends out ${speciesName(nextOpponent)}.`
+          },
+          party,
+          dialogue: [`Badge Meadow sends out ${speciesName(nextOpponent)}.`, battle.message, ...state.dialogue].slice(0, 5)
+        };
+      }
+      return {
+        ...state,
+        battle: null,
+        party,
+        meadowBadge: true,
+        pathOpen: true,
+        winPanel: true,
+        dialogue: ["You earned the Meadow Badge. The Briarbrook League begins.", battle.message, ...state.dialogue].slice(0, 5)
+      };
+    }
     return {
       ...state,
       battle: null,
@@ -131,4 +163,34 @@ export function attemptCapture(state: GameState, rng: Rng): GameState {
 
 function markSeen(guide: GameState["guide"], speciesId: string): GameState["guide"] {
   return guide[speciesId] === "captured" ? guide : { ...guide, [speciesId]: "seen" };
+}
+
+function startTrainerBattle(state: GameState): GameState {
+  const player = state.party.find((creature) => creature.hp > 0);
+  if (!player) {
+    return { ...state, dialogue: ["The Badge Meadow trainer waits until your party is restored.", ...state.dialogue].slice(0, 5) };
+  }
+  const firstOpponent = createCreature("petalark", 4);
+  const secondOpponent = createCreature("bramblet", 5);
+  return {
+    ...state,
+    battle: {
+      kind: "trainer",
+      player,
+      opponent: firstOpponent,
+      remainingOpponents: [secondOpponent],
+      message: "Badge Meadow trainer Liora challenges you."
+    },
+    guide: markSeen(markSeen(state.guide, firstOpponent.speciesId), secondOpponent.speciesId),
+    dialogue: ["Badge Meadow trainer Liora challenges you.", ...state.dialogue].slice(0, 5)
+  };
+}
+
+function openBadgePath(state: GameState): GameState {
+  return {
+    ...state,
+    pathOpen: true,
+    winPanel: true,
+    dialogue: ["The path beyond Badge Meadow is open.", ...state.dialogue].slice(0, 5)
+  };
 }

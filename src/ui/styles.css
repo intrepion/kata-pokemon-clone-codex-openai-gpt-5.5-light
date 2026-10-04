@@ -92,6 +92,13 @@ button:focus-visible {
   margin: 0 0 0.5rem;
 }
 
+.win-panel {
+  background: #f4d27b;
+  color: #1f2a24;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+}
+
 .starter-card {
   display: grid;
   gap: 0.25rem;

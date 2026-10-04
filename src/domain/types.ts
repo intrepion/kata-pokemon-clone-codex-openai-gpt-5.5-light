@@ -40,6 +40,7 @@ export interface BattleState {
   readonly kind: "wild" | "trainer";
   readonly player: CreatureInstance;
   readonly opponent: CreatureInstance;
+  readonly remainingOpponents?: readonly CreatureInstance[];
   readonly message: string;
 }
 
@@ -51,6 +52,9 @@ export interface GameState {
   readonly party: readonly CreatureInstance[];
   readonly captureCharms: number;
   readonly guide: Readonly<Record<string, "seen" | "captured">>;
+  readonly meadowBadge: boolean;
+  readonly pathOpen: boolean;
+  readonly winPanel: boolean;
   readonly battle: BattleState | null;
   readonly dialogue: readonly string[];
 }

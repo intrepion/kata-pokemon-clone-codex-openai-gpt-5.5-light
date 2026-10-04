@@ -23,6 +23,9 @@ export function parseSavedState(raw: string | null): GameState | null {
       party: parsed.party,
       captureCharms: parsed.captureCharms ?? 5,
       guide: parsed.guide ?? {},
+      meadowBadge: parsed.meadowBadge ?? false,
+      pathOpen: parsed.pathOpen ?? false,
+      winPanel: parsed.winPanel ?? false,
       battle: null,
       dialogue: parsed.dialogue ?? ["Welcome back to Briarbrook League."]
     };

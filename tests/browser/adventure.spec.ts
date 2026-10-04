@@ -57,3 +57,20 @@ test("player can capture a wild creature and restore autosave on reload", async 
   await expect(page.getByTestId("field-guide")).toContainText("captured");
   await expect(page.getByTestId("status")).toContainText("Capture Charms: 4");
 });
+
+test("player can earn the Meadow Badge and see the win panel", async ({ page }) => {
+  await page.goto("/?seed=999");
+
+  await page.getByRole("button", { name: /Cindillo/ }).click();
+  for (const key of ["ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight", "Space"]) {
+    await page.keyboard.press(key);
+  }
+
+  await expect(page.getByTestId("battle")).toContainText("Badge Meadow");
+  for (let i = 0; i < 4; i += 1) {
+    await page.getByRole("button", { name: "Cinder Roll" }).click();
+  }
+
+  await expect(page.getByTestId("status")).toContainText("Meadow Badge: earned");
+  await expect(page.getByTestId("win-panel")).toContainText("Briarbrook League begins");
+});

@@ -91,6 +91,26 @@ export const CREATURES: Record<string, CreatureSpecies> = {
       { id: "wing-dust", name: "Wing Dust", type: "neutral", power: 4 },
       { id: "husk-rattle", name: "Husk Rattle", type: "neutral", power: 5 }
     ]
+  },
+  petalark: {
+    id: "petalark",
+    name: "Petalark",
+    type: "leaf",
+    maxHp: 20,
+    moves: [
+      { id: "peck", name: "Peck", type: "neutral", power: 5 },
+      { id: "petal-gust", name: "Petal Gust", type: "leaf", power: 7 }
+    ]
+  },
+  bramblet: {
+    id: "bramblet",
+    name: "Bramblet",
+    type: "leaf",
+    maxHp: 22,
+    moves: [
+      { id: "tackle", name: "Tackle", type: "neutral", power: 5 },
+      { id: "thorn-loop", name: "Thorn Loop", type: "leaf", power: 7 }
+    ]
   }
 };
 

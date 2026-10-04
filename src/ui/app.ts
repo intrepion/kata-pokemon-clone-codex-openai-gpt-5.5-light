@@ -30,6 +30,7 @@ export function mountApp(root: HTMLElement): void {
       <section class="panel" aria-label="Journey controls">
         <h1>Briarbrook League</h1>
         <p class="status" data-testid="status"></p>
+        <div class="win-panel" data-testid="win-panel"></div>
         <div class="battle" data-testid="battle"></div>
         <div class="field-guide" data-testid="field-guide"></div>
         <div class="starter-grid" data-testid="starter-grid"></div>
@@ -51,7 +52,8 @@ export function mountApp(root: HTMLElement): void {
   const dialogueElement = root.querySelector<HTMLElement>("[data-testid='dialogue']");
   const battleElement = root.querySelector<HTMLElement>("[data-testid='battle']");
   const guideElement = root.querySelector<HTMLElement>("[data-testid='field-guide']");
-  if (!canvasElement || !statusElement || !starterGridElement || !dialogueElement || !battleElement || !guideElement) {
+  const winElement = root.querySelector<HTMLElement>("[data-testid='win-panel']");
+  if (!canvasElement || !statusElement || !starterGridElement || !dialogueElement || !battleElement || !guideElement || !winElement) {
     throw new Error("Briarbrook UI failed to mount.");
   }
   const canvas = canvasElement;
@@ -60,13 +62,15 @@ export function mountApp(root: HTMLElement): void {
   const dialogue = dialogueElement;
   const battlePanel = battleElement;
   const fieldGuide = guideElement;
+  const winPanel = winElement;
 
   function render(): void {
     drawScene(canvas, state);
     const starter = STARTERS.find((candidate) => candidate.id === state.starterId);
     const lead = state.party[0];
     const hpText = lead ? ` ${CREATURES[lead.speciesId]?.name ?? lead.speciesId} HP ${lead.hp}.` : "";
-    status.textContent = `Tile ${state.position.x},${state.position.y} facing ${state.facing}. Starter: ${starter?.name ?? "none"}.${hpText} Capture Charms: ${state.captureCharms}.`;
+    status.textContent = `Tile ${state.position.x},${state.position.y} facing ${state.facing}. Starter: ${starter?.name ?? "none"}.${hpText} Capture Charms: ${state.captureCharms}. Meadow Badge: ${state.meadowBadge ? "earned" : "not yet"}.`;
+    winPanel.innerHTML = state.winPanel ? "<strong>Briarbrook League begins.</strong><p>The path beyond Badge Meadow is open.</p>" : "";
     battlePanel.innerHTML = state.battle ? battleMarkup(state.battle) : "";
     fieldGuide.innerHTML = guideMarkup(state);
     starterGrid.innerHTML = STARTERS.map(starterOption).join("");
