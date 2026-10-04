@@ -1,0 +1,98 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #1f2a24;
+  color: #f7edcf;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+button {
+  border: 2px solid #2a382d;
+  background: #f4d27b;
+  color: #1f2a24;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.55rem 0.7rem;
+}
+
+button:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 2fr) minmax(280px, 1fr);
+  min-height: 100vh;
+}
+
+.stage {
+  align-items: center;
+  background: #111712;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.game-canvas {
+  border: 4px solid #f4d27b;
+  image-rendering: pixelated;
+  max-height: calc(100vh - 2rem);
+  max-width: 100%;
+}
+
+.panel {
+  background: #36543d;
+  border-left: 4px solid #18251b;
+  padding: 1rem;
+}
+
+.panel h1 {
+  font-size: 1.6rem;
+  margin: 0 0 0.8rem;
+}
+
+.status {
+  min-height: 3rem;
+}
+
+.starter-grid {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.starter-card {
+  display: grid;
+  gap: 0.25rem;
+  text-align: left;
+}
+
+.controls {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 1rem 0;
+}
+
+.dialogue {
+  background: #f7edcf;
+  color: #1f2a24;
+  margin: 0;
+  min-height: 8rem;
+  padding: 1rem 1rem 1rem 2rem;
+}
+
+@media (max-width: 760px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    border-left: 0;
+    border-top: 4px solid #18251b;
+  }
+}
