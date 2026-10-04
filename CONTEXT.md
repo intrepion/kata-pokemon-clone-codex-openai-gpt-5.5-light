@@ -76,6 +76,10 @@ _Avoid_: First level
 One of the four wild creatures discoverable on Route 1 during the First Badge Loop.
 _Avoid_: Common spawn, early monster
 
+**Neutral Creature**:
+A creature without Leaf, Ember, or Tide type advantage in the First Badge Loop.
+_Avoid_: Normal type, typeless creature
+
 **Healing Hut**:
 A safe location where the trainer restores the party and restocks basic capture supplies.
 _Avoid_: Pokemon Center, shop
@@ -116,6 +120,26 @@ _Avoid_: Random battle
 A scripted encounter against another trainer's party that tests player progression and cannot be solved by capture.
 _Avoid_: Duel, PvP, boss fight
 
+**Turn**:
+A single battle action by one side in an encounter.
+_Avoid_: Round, tick
+
+**Neutral Move**:
+A reliable move that does not use Leaf, Ember, or Tide advantage.
+_Avoid_: Basic attack, normal move
+
+**Typed Move**:
+A move that uses the creature's type relationship to apply advantage or disadvantage.
+_Avoid_: Special move, elemental attack
+
+**Faint**:
+The battle state where a creature has no remaining HP and can no longer act until restored.
+_Avoid_: Death, knockout
+
+**Blackout**:
+The consequence of all active party creatures fainting, returning the trainer to the Healing Hut with a small Capture Charm loss.
+_Avoid_: Game over, wipe
+
 **Capture**:
 The act of adding a wild creature to the player's collection through a battle item and probability check.
 _Avoid_: Tame, recruit, catch Pokemon
@@ -143,3 +167,7 @@ _Avoid_: Manual save, checkpoint
 **First Badge Loop**:
 The initial complete progression arc: choose a starter, explore a route, capture creatures, heal, defeat the first major trainer challenge, and earn a badge.
 _Avoid_: Tutorial, vertical slice
+
+**Win Panel**:
+The completion screen shown after earning the Meadow Badge and opening the path beyond Badge Meadow.
+_Avoid_: End screen, victory modal
