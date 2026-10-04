@@ -104,6 +104,14 @@ _Avoid_: Cooldown, immunity window
 A one-button interaction with the tile directly in front of the trainer.
 _Avoid_: Click interaction, dialogue tree
 
+**Confirm Control**:
+The input action used to advance dialogue, select menu items, and interact with the faced tile.
+_Avoid_: Action button, A button
+
+**Cancel Control**:
+The input action used to back out of menus, close panels, or decline optional choices.
+_Avoid_: B button, escape key
+
 **Encounter**:
 A modal interaction that interrupts exploration and resolves through battle, capture, flee, or scripted trainer victory.
 _Avoid_: Fight, event, combat screen
@@ -171,3 +179,7 @@ _Avoid_: Tutorial, vertical slice
 **Win Panel**:
 The completion screen shown after earning the Meadow Badge and opening the path beyond Badge Meadow.
 _Avoid_: End screen, victory modal
+
+**Dialogue Log**:
+A readable record of recent dialogue and battle messages available during play.
+_Avoid_: Text feed, console
