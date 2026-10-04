@@ -1,6 +1,6 @@
 import { STARTERS } from "../data/starters";
 import type { BattleState, Direction, Starter } from "../domain/types";
-import { attemptCapture, chooseStarter, createInitialState, interact, moveTrainer, useMove } from "../domain/game";
+import { attemptCapture, cancelAction, chooseStarter, createInitialState, interact, moveTrainer, startWildEncounter, useMove } from "../domain/game";
 import { SeededRng } from "../domain/rng";
 import { CREATURES } from "../data/starters";
 import { parseSavedState, SAVE_KEY, serializeState } from "../domain/storage";
@@ -21,6 +21,7 @@ const DIRECTIONS: Record<string, Direction> = {
 
 export function mountApp(root: HTMLElement): void {
   const params = new URLSearchParams(window.location.search);
+  const testMode = params.get("test") === "1";
   const rng = new SeededRng(Number(params.get("seed") ?? 7));
   const audio = new AudioCues();
   let state = parseSavedState(window.localStorage.getItem(SAVE_KEY)) ?? createInitialState();
@@ -33,6 +34,7 @@ export function mountApp(root: HTMLElement): void {
         <h1>Briarbrook League</h1>
         <p class="status" data-testid="status"></p>
         <button class="mute" data-action="mute" aria-pressed="true">Muted</button>
+        <button class="reset" data-action="reset">Reset</button>
         <div class="win-panel" data-testid="win-panel"></div>
         <div class="battle" data-testid="battle"></div>
         <div class="field-guide" data-testid="field-guide"></div>
@@ -109,6 +111,11 @@ export function mountApp(root: HTMLElement): void {
       audio.play(state.battle ? "battle" : "confirm");
       render();
     }
+    if (target.dataset.action === "cancel") {
+      state = cancelAction(state);
+      audio.play("confirm");
+      render();
+    }
     if (target.dataset.move === "0" || target.dataset.move === "1") {
       state = useMove(state, Number(target.dataset.move) as 0 | 1);
       audio.play(state.winPanel ? "badge" : "hit");
@@ -123,6 +130,11 @@ export function mountApp(root: HTMLElement): void {
       audio.setMuted(!audio.isMuted());
       target.textContent = audio.isMuted() ? "Muted" : "Sound On";
       target.setAttribute("aria-pressed", String(audio.isMuted()));
+    }
+    if (target.dataset.action === "reset") {
+      window.localStorage.removeItem(SAVE_KEY);
+      state = createInitialState();
+      render();
     }
   });
 
@@ -140,7 +152,30 @@ export function mountApp(root: HTMLElement): void {
       audio.play(state.battle ? "battle" : "confirm");
       render();
     }
+    if (["Escape", "KeyX"].includes(event.code)) {
+      event.preventDefault();
+      state = cancelAction(state);
+      audio.play("confirm");
+      render();
+    }
   });
+
+  if (testMode) {
+    window.__briarbrookTestHooks = {
+      forceEncounter() {
+        state = startWildEncounter(state, rng);
+        render();
+      },
+      grantCharms(count: number) {
+        state = { ...state, captureCharms: count };
+        render();
+      },
+      jumpTo(x: number, y: number) {
+        state = { ...state, position: { x, y } };
+        render();
+      }
+    };
+  }
 
   render();
 }
@@ -179,4 +214,14 @@ function guideMarkup(state: ReturnType<typeof createInitialState>): string {
     <p>${entries.length} discovered</p>
     <ul>${entries.map(([speciesId, status]) => `<li>${CREATURES[speciesId]?.name ?? speciesId}: ${status}</li>`).join("")}</ul>
   `;
+}
+
+declare global {
+  interface Window {
+    __briarbrookTestHooks?: {
+      forceEncounter(): void;
+      grantCharms(count: number): void;
+      jumpTo(x: number, y: number): void;
+    };
+  }
 }

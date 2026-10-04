@@ -57,6 +57,7 @@ export function interact(state: GameState): GameState {
     return {
       ...state,
       party: state.party.map(healCreature),
+      captureCharms: Math.max(5, state.captureCharms),
       dialogue: ["Your party is restored at the Healing Hut.", ...state.dialogue].slice(0, 5)
     };
   }
@@ -92,6 +93,9 @@ export function useMove(state: GameState, moveIndex: 0 | 1): GameState {
   }
   const battle = usePlayerMove(state.battle, moveIndex);
   const party = state.party.map((creature) => (creature.instanceId === battle.player.instanceId ? battle.player : creature));
+  if (battle.player.hp === 0 && battle.opponent.hp > 0) {
+    return handlePlayerFaint(state, battle, party);
+  }
   if (battle.opponent.hp === 0) {
     if (battle.kind === "trainer") {
       const nextOpponent = battle.remainingOpponents?.[0];
@@ -152,13 +156,27 @@ export function attemptCapture(state: GameState, rng: Rng): GameState {
     };
   }
   const battle = usePlayerMove(state.battle, 0);
+  const party = state.party.map((creature) => (creature.instanceId === battle.player.instanceId ? battle.player : creature));
+  if (battle.player.hp === 0 && battle.opponent.hp > 0) {
+    return handlePlayerFaint({ ...state, captureCharms }, battle, party);
+  }
   return {
     ...state,
     battle,
-    party: state.party.map((creature) => (creature.instanceId === battle.player.instanceId ? battle.player : creature)),
+    party,
     captureCharms,
     dialogue: [`Capture failed. ${battle.message}`, ...state.dialogue].slice(0, 5)
   };
+}
+
+export function cancelAction(state: GameState): GameState {
+  if (!state.battle) {
+    return { ...state, dialogue: ["Nothing to cancel.", ...state.dialogue].slice(0, 5) };
+  }
+  if (state.battle.kind === "trainer") {
+    return { ...state, dialogue: ["Trainer battles cannot be cancelled.", ...state.dialogue].slice(0, 5) };
+  }
+  return { ...state, battle: null, dialogue: ["You backed away from the wild encounter.", ...state.dialogue].slice(0, 5) };
 }
 
 function markSeen(guide: GameState["guide"], speciesId: string): GameState["guide"] {
@@ -192,5 +210,26 @@ function openBadgePath(state: GameState): GameState {
     pathOpen: true,
     winPanel: true,
     dialogue: ["The path beyond Badge Meadow is open.", ...state.dialogue].slice(0, 5)
+  };
+}
+
+function handlePlayerFaint(state: GameState, battle: NonNullable<GameState["battle"]>, party: readonly GameState["party"][number][]): GameState {
+  const nextCreature = party.find((creature) => creature.hp > 0 && creature.instanceId !== battle.player.instanceId);
+  if (nextCreature) {
+    return {
+      ...state,
+      party,
+      battle: { ...battle, player: nextCreature, message: `${speciesName(battle.player)} fainted. ${speciesName(nextCreature)} steps in.` },
+      dialogue: [`${speciesName(battle.player)} fainted. ${speciesName(nextCreature)} steps in.`, battle.message, ...state.dialogue].slice(0, 5)
+    };
+  }
+  return {
+    ...state,
+    position: { x: 3, y: 7 },
+    facing: "north",
+    battle: null,
+    party: party.map(healCreature),
+    captureCharms: Math.max(0, state.captureCharms - 1),
+    dialogue: ["Your party blacked out and returned to the Healing Hut.", battle.message, ...state.dialogue].slice(0, 5)
   };
 }
