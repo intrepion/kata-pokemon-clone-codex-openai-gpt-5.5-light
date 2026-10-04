@@ -4,13 +4,17 @@ import type { Direction, GameState, Starter } from "./types";
 import { facedPosition, move, objectAt, tileAt } from "../world/map";
 import { createCreature, healCreature, speciesName, usePlayerMove } from "./battle";
 import { pickOne, type Rng } from "./rng";
+import { captureChance } from "./capture";
 
 export function createInitialState(): GameState {
   return {
+    version: 1,
     position: HOME_MAP.start,
     facing: "north",
     starterId: null,
     party: [],
+    captureCharms: 5,
+    guide: {},
     battle: null,
     dialogue: ["Welcome to Briarbrook League."]
   };
@@ -25,6 +29,7 @@ export function chooseStarter(state: GameState, starterId: Starter["id"]): GameS
     ...state,
     starterId,
     party: [createCreature(starterId, 5)],
+    guide: { ...state.guide, [starterId]: "captured" },
     dialogue: [`${starter.name} joined your party.`, ...state.dialogue].slice(0, 5)
   };
 }
@@ -64,6 +69,7 @@ export function startWildEncounter(state: GameState, rng: Rng): GameState {
   const opponent = createCreature(opponentId, 3);
   return {
     ...state,
+    guide: markSeen(state.guide, opponent.speciesId),
     battle: {
       kind: "wild",
       player,
@@ -89,4 +95,40 @@ export function useMove(state: GameState, moveIndex: 0 | 1): GameState {
     };
   }
   return { ...state, battle, party, dialogue: [battle.message, ...state.dialogue].slice(0, 5) };
+}
+
+export function attemptCapture(state: GameState, rng: Rng): GameState {
+  if (!state.battle || state.battle.kind !== "wild") {
+    return state;
+  }
+  if (state.captureCharms <= 0) {
+    return { ...state, dialogue: ["No Capture Charms remain.", ...state.dialogue].slice(0, 5) };
+  }
+  const captureCharms = state.captureCharms - 1;
+  const speciesId = state.battle.opponent.speciesId;
+  const chance = captureChance(state.battle, Boolean(state.guide[speciesId]));
+  if (rng.next() <= chance) {
+    const captured = { ...state.battle.opponent, hp: Math.max(1, state.battle.opponent.hp) };
+    const party = state.party.length < 3 ? [...state.party, captured] : state.party;
+    return {
+      ...state,
+      battle: null,
+      party,
+      captureCharms,
+      guide: { ...state.guide, [speciesId]: "captured" },
+      dialogue: [`${speciesName(captured)} joined your party.`, ...state.dialogue].slice(0, 5)
+    };
+  }
+  const battle = usePlayerMove(state.battle, 0);
+  return {
+    ...state,
+    battle,
+    party: state.party.map((creature) => (creature.instanceId === battle.player.instanceId ? battle.player : creature)),
+    captureCharms,
+    dialogue: [`Capture failed. ${battle.message}`, ...state.dialogue].slice(0, 5)
+  };
+}
+
+function markSeen(guide: GameState["guide"], speciesId: string): GameState["guide"] {
+  return guide[speciesId] === "captured" ? guide : { ...guide, [speciesId]: "seen" };
 }

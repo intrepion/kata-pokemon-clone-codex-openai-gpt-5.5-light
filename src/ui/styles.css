@@ -80,6 +80,18 @@ button:focus-visible {
   margin: 0;
 }
 
+.field-guide {
+  background: rgba(17, 23, 18, 0.35);
+  border: 2px solid #18251b;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+}
+
+.field-guide h2 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+
 .starter-card {
   display: grid;
   gap: 0.25rem;

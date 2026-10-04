@@ -44,10 +44,13 @@ export interface BattleState {
 }
 
 export interface GameState {
+  readonly version: 1;
   readonly position: Position;
   readonly facing: Direction;
   readonly starterId: Starter["id"] | null;
   readonly party: readonly CreatureInstance[];
+  readonly captureCharms: number;
+  readonly guide: Readonly<Record<string, "seen" | "captured">>;
   readonly battle: BattleState | null;
   readonly dialogue: readonly string[];
 }

@@ -1,8 +1,9 @@
 import { STARTERS } from "../data/starters";
 import type { BattleState, Direction, Starter } from "../domain/types";
-import { chooseStarter, createInitialState, interact, moveTrainer, useMove } from "../domain/game";
+import { attemptCapture, chooseStarter, createInitialState, interact, moveTrainer, useMove } from "../domain/game";
 import { SeededRng } from "../domain/rng";
 import { CREATURES } from "../data/starters";
+import { parseSavedState, SAVE_KEY, serializeState } from "../domain/storage";
 import { drawScene } from "../render/canvas";
 import "./styles.css";
 
@@ -20,7 +21,7 @@ const DIRECTIONS: Record<string, Direction> = {
 export function mountApp(root: HTMLElement): void {
   const params = new URLSearchParams(window.location.search);
   const rng = new SeededRng(Number(params.get("seed") ?? 7));
-  let state = createInitialState();
+  let state = parseSavedState(window.localStorage.getItem(SAVE_KEY)) ?? createInitialState();
   root.innerHTML = `
     <main class="shell">
       <section class="stage" aria-label="Briarbrook map">
@@ -30,6 +31,7 @@ export function mountApp(root: HTMLElement): void {
         <h1>Briarbrook League</h1>
         <p class="status" data-testid="status"></p>
         <div class="battle" data-testid="battle"></div>
+        <div class="field-guide" data-testid="field-guide"></div>
         <div class="starter-grid" data-testid="starter-grid"></div>
         <div class="controls" aria-label="Movement controls">
           <button data-dir="north">Up</button>
@@ -48,7 +50,8 @@ export function mountApp(root: HTMLElement): void {
   const starterGridElement = root.querySelector<HTMLElement>("[data-testid='starter-grid']");
   const dialogueElement = root.querySelector<HTMLElement>("[data-testid='dialogue']");
   const battleElement = root.querySelector<HTMLElement>("[data-testid='battle']");
-  if (!canvasElement || !statusElement || !starterGridElement || !dialogueElement || !battleElement) {
+  const guideElement = root.querySelector<HTMLElement>("[data-testid='field-guide']");
+  if (!canvasElement || !statusElement || !starterGridElement || !dialogueElement || !battleElement || !guideElement) {
     throw new Error("Briarbrook UI failed to mount.");
   }
   const canvas = canvasElement;
@@ -56,16 +59,19 @@ export function mountApp(root: HTMLElement): void {
   const starterGrid = starterGridElement;
   const dialogue = dialogueElement;
   const battlePanel = battleElement;
+  const fieldGuide = guideElement;
 
   function render(): void {
     drawScene(canvas, state);
     const starter = STARTERS.find((candidate) => candidate.id === state.starterId);
     const lead = state.party[0];
     const hpText = lead ? ` ${CREATURES[lead.speciesId]?.name ?? lead.speciesId} HP ${lead.hp}.` : "";
-    status.textContent = `Tile ${state.position.x},${state.position.y} facing ${state.facing}. Starter: ${starter?.name ?? "none"}.${hpText}`;
+    status.textContent = `Tile ${state.position.x},${state.position.y} facing ${state.facing}. Starter: ${starter?.name ?? "none"}.${hpText} Capture Charms: ${state.captureCharms}.`;
     battlePanel.innerHTML = state.battle ? battleMarkup(state.battle) : "";
+    fieldGuide.innerHTML = guideMarkup(state);
     starterGrid.innerHTML = STARTERS.map(starterOption).join("");
     dialogue.innerHTML = state.dialogue.map((line) => `<li>${line}</li>`).join("");
+    window.localStorage.setItem(SAVE_KEY, serializeState(state));
   }
 
   function choose(starterId: Starter["id"]): void {
@@ -96,6 +102,10 @@ export function mountApp(root: HTMLElement): void {
     }
     if (target.dataset.move === "0" || target.dataset.move === "1") {
       state = useMove(state, Number(target.dataset.move) as 0 | 1);
+      render();
+    }
+    if (target.dataset.action === "capture") {
+      state = attemptCapture(state, rng);
       render();
     }
   });
@@ -137,6 +147,18 @@ function battleMarkup(battle: BattleState): string {
       <p>${player.name} HP ${battle.player.hp} vs ${opponent.name} HP ${battle.opponent.hp}</p>
       <button data-move="0">${player.moves[0].name}</button>
       <button data-move="1">${player.moves[1].name}</button>
+      <button data-action="capture">Capture Charm</button>
     </section>
+  `;
+}
+
+function guideMarkup(state: ReturnType<typeof createInitialState>): string {
+  const entries = Object.entries(state.guide);
+  const partyNames = state.party.map((creature) => CREATURES[creature.speciesId]?.name ?? creature.speciesId).join(", ") || "none";
+  return `
+    <h2>Field Guide</h2>
+    <p>Party: ${partyNames}</p>
+    <p>${entries.length} discovered</p>
+    <ul>${entries.map(([speciesId, status]) => `<li>${CREATURES[speciesId]?.name ?? speciesId}: ${status}</li>`).join("")}</ul>
   `;
 }
