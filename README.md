@@ -1,5 +1,9 @@
 # Briarbrook League
 
+## Play online
+
+[Play Briarbrook League](https://intrepion.github.io/kata-pokemon-clone-codex-openai-gpt-5.5-light/) — free, playable in your browser.
+
 Briarbrook League is an original top-down creature-catching browser RPG inspired by the early Pokemon first-route and first-badge loop.
 
 ## Development
