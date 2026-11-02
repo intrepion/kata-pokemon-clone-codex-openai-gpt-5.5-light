@@ -40,3 +40,7 @@ Or run the full local gate:
 ```sh
 npm run check
 ```
+
+## Arcade metadata
+
+See [docs/arcade-metadata.md](docs/arcade-metadata.md) for the game-owned manifest and screenshot provenance.
