@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "workflowCommit": "b22eaba41a1ae313379ea645f7e388bdefe6f6d5",
+  "sourceCommit": "fd2b36209614b3c18775c4eae109d583a6d92d87",
+  "runId": "41425632655",
+  "url": "http://127.0.0.1:4263/",
+  "inputs": {
+    "index.html": "f6e4e6cc34597ab4c2093a41eca577906bbb1954b5cbd66bd146d3ace52f005d"
+  },
+  "browser": "153.0.8010.12",
+  "viewport": {
+    "width": 1280,
+    "height": 1000
+  },
+  "screenshots": [
+    "briarbrook-01.png",
+    "briarbrook-02.png"
+  ]
+}

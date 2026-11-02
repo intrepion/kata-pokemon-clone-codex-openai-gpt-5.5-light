@@ -1,6 +1,43 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "gameId": "kata-pokemon-clone-codex-openai-gpt-5.5-light",
   "playUrl": "https://intrepion.github.io/kata-pokemon-clone-codex-openai-gpt-5.5-light/",
-  "screenshots": []
+  "screenshots": [
+    {
+      "path": "arcade/screenshots/ci-20261102-01.jpg",
+      "sha256": "a825915dc7e37c559f9d4dba0ab53396213b7aaa70d2383723543f441cf319d2",
+      "alt": "Briarbrook League gameplay, view 1",
+      "provenance": {
+        "kind": "ci_gameplay_capture",
+        "sourcePath": "arcade/capture-evidence/ci-20261102-01.png",
+        "sourceSha256": "45db8fd752e5f8314b45ed4e9b1a0c09de58e8fd7f4a4ab496a5dbc688f66f1e",
+        "captureCommit": "fd2b36209614b3c18775c4eae109d583a6d92d87",
+        "workflowRunId": "41425632655",
+        "inputHashes": {
+          "index.html": "f6e4e6cc34597ab4c2093a41eca577906bbb1954b5cbd66bd146d3ace52f005d"
+        },
+        "publishedFilesVerifiedAt": "2026-11-02T19:01:20Z",
+        "captureRecordPath": "arcade/capture-evidence/ci-20261102-record.json",
+        "captureRecordSha256": "084f7b36d9db067dceccf554e9e982df7b3baf6d11c995bb3defac89d74e7cbf"
+      }
+    },
+    {
+      "path": "arcade/screenshots/ci-20261102-02.jpg",
+      "sha256": "975bdc6e1088d9a603276075ae0ad3a8c864e647c7f97d7c81b77bcb5a0bdcfc",
+      "alt": "Briarbrook League gameplay, view 2",
+      "provenance": {
+        "kind": "ci_gameplay_capture",
+        "sourcePath": "arcade/capture-evidence/ci-20261102-02.png",
+        "sourceSha256": "4d040241b895fb8af555537e64583f32fcdd7480279fb5aafe609c193caf051f",
+        "captureCommit": "fd2b36209614b3c18775c4eae109d583a6d92d87",
+        "workflowRunId": "41425632655",
+        "inputHashes": {
+          "index.html": "f6e4e6cc34597ab4c2093a41eca577906bbb1954b5cbd66bd146d3ace52f005d"
+        },
+        "publishedFilesVerifiedAt": "2026-11-02T19:01:20Z",
+        "captureRecordPath": "arcade/capture-evidence/ci-20261102-record.json",
+        "captureRecordSha256": "084f7b36d9db067dceccf554e9e982df7b3baf6d11c995bb3defac89d74e7cbf"
+      }
+    }
+  ]
 }
